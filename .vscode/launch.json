@@ -1,0 +1,54 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ravenry",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "ravenry (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "ravenry (release mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    },
+    {
+      "name": "librarian_bot",
+      "cwd": "packages\\librarian_bot",
+      "request": "launch",
+      "type": "dart",
+      "env": {
+        "EXTRA_ENV": ".env.prod"
+      }
+    },
+    {
+      "name": "res_client",
+      "cwd": "packages\\res_client",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "res_client (profile mode)",
+      "cwd": "packages\\res_client",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "res_client (release mode)",
+      "cwd": "packages\\res_client",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}

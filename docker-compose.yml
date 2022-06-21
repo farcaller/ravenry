@@ -1,0 +1,8 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  reverse_ws:
+    ports:
+      - "8000:80"
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro

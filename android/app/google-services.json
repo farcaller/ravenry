@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "804410762246",
+    "project_id": "ravenry",
+    "storage_bucket": "ravenry.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804410762246:android:849a932d57a72a5b790f87",
+        "android_client_info": {
+          "package_name": "org.hackndev.ravenry"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "804410762246-qkj631gfra8nald9u7jgqkgqvq4et6qb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNfzdNLDM7Ar7X1QvXGkOlQeJwm1h4-1U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "804410762246-qkj631gfra8nald9u7jgqkgqvq4et6qb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "804410762246-89np9mjv3h5skkudrngsh6ft7c2epkvl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ravenry"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

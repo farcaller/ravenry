@@ -12,6 +12,8 @@ jobs:
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
+        env:
+          BUNDLE_GEMFILE: ${{ github.workspace }}/android/Gemfile
         with:
           bundler-cache: true
 

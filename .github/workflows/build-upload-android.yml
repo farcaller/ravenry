@@ -1,0 +1,42 @@
+name: Android Build & Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      
+      - run: flutter pub get
+
+      - name: Set up andorid credenitals
+        run: |
+          echo "storePassword=::add-mask::${{ secrets.KEYSTORE_PASSWORD }}" > andorid/key.properties
+          echo "keyPassword=::add-mask::${{ secrets.KEY_PASSWORD }}" >> andorid/key.properties
+          echo "keyAlias=::add-mask::${{ secrets.KEY_ALIAS }}" >> andorid/key.properties
+          echo "storeFile=keystore.jks" >> andorid/key.properties
+          echo "::add-mask::${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
+
+          echo "::add-mask::${{ secrets.PLAYSTORE_CREDENTIALS }}" | base64 -d > android/playstore-credentials.jks
+
+      - name: Build & deploy Android release
+        run: |
+          cd android
+          bundle exec fastlane deploy_internal

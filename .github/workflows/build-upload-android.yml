@@ -6,24 +6,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
+  # TODO: /home/runner/work/_temp/edd378df-9516-480d-bfa0-94fdd96d7a26.sh: line 1: flutter: command not found
+  # setup:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v2
-        with:
-          path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.os }}-flutter
+  #     - name: Cache Flutter dependencies
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: /opt/hostedtoolcache/flutter
+  #         key: ${{ runner.os }}-flutter
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+  #     - uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: 'stable'
 
   deploy:
-    needs: setup
+    # needs: setup
     runs-on: ubuntu-latest
 
     steps:
@@ -43,12 +44,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Cache Flutter
-        id: cache-flutter
-        uses: actions/cache@v2
+      # TODO: see above
+      # - name: Cache Flutter
+      #   id: cache-flutter
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: /opt/hostedtoolcache/flutter
+      #     key: ${{ runner.os }}-flutter
+
+      - uses: subosito/flutter-action@v2
         with:
-          path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.os }}-flutter
+          channel: 'stable'
       
       - run: flutter pub get
 

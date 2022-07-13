@@ -6,11 +6,40 @@ on:
   workflow_dispatch:
 
 jobs:
+  setup:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            flutter_path: /opt/hostedtoolcache/flutter
+          - os: macos-latest
+            flutter_path: /Users/runner/hostedtoolcache/flutter
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ matrix.flutter_path }}
+          key: ${{ runner.os }}-flutter
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
   deploy:
+    needs: setup
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up ruby env
         uses: ruby/setup-ruby@v1
@@ -23,10 +52,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      
-      - uses: subosito/flutter-action@v2
+
+      - name: Cache Flutter
+        id: cache-flutter
+        uses: actions/cache@v2
         with:
-          channel: 'stable'
+          path: ${{ matrix.flutter_path }}
+          key: ${{ runner.os }}-flutter
       
       - run: flutter pub get
 
@@ -43,7 +75,7 @@ jobs:
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=keystore.jks" >> android/key.properties
-          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/app/keystore.jks
 
           echo "${{ secrets.PLAYSTORE_CREDENTIALS }}" | base64 -d > android/playstore-credentials.jks
 

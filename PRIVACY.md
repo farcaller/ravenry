@@ -29,7 +29,7 @@ No
 
 # Do we disclose any information to outside parties?
 
-We expose the crash data to Firebase. The firebase privacy policy is [availiable
+We expose the crash data to Firebase. The firebase privacy policy is [available
 here](https://firebase.google.com/support/privacy).
 
 # Children’s Online Privacy Protection Act Compliance

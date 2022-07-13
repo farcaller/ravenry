@@ -32,13 +32,20 @@ jobs:
 
       - name: Set up andorid credenitals
         run: |
-          echo "storePassword=::add-mask::${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-          echo "keyPassword=::add-mask::${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=::add-mask::${{ secrets.KEY_ALIAS }}" >> android/key.properties
-          echo "storeFile=keystore.jks" >> android/key.properties
-          echo "::add-mask::${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
+          echo "::add-mask::${{ secrets.KEYSTORE_PASSWORD }}"
+          echo "::add-mask::${{ secrets.KEY_PASSWORD }}"
+          echo "::add-mask::${{ secrets.KEY_ALIAS }}"
+          echo "::add-mask::${{ secrets.KEYSTORE_FILE }}"
+          echo "::add-mask::${{ secrets.PLAYSTORE_CREDENTIALS }}"
 
-          echo "::add-mask::${{ secrets.PLAYSTORE_CREDENTIALS }}" | base64 -d > android/playstore-credentials.jks
+
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/keystore.jks
+
+          echo "${{ secrets.PLAYSTORE_CREDENTIALS }}" | base64 -d > android/playstore-credentials.jks
 
       - name: Build & deploy Android release
         run: |

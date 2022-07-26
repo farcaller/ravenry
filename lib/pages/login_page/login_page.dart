@@ -15,6 +15,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:glog/glog.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -184,6 +185,13 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  _onMuckletLogin() async {
+    final result = await FlutterWebAuth.authenticate(
+        url:
+            'https://auth.mucklet.com/google?client_id=ravenry&redirect_uri=org.hackndev.ravenry%3A%2F%2Fauth%2Fcallback',
+        callbackUrlScheme: 'org.hackndev.ravenry');
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_resolvingSavedAuth || _loggingIn) {
@@ -271,6 +279,19 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: _muckletApi != null ? _onLogin : null,
                         child: const Text(
                           'Login',
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 40,
+                      child: OutlinedButton(
+                        onPressed: _muckletApi != null ? _onMuckletLogin : null,
+                        child: const Text(
+                          'Login with Mucklet',
                         ),
                       ),
                     ),

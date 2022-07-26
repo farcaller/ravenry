@@ -1,5 +1,10 @@
 {
   "files.exclude": {
     "**/*.g.dart": true
-  }
+  },
+  "cSpell.words": [
+    "glog",
+    "mucklets",
+    "Ravenry"
+  ]
 }

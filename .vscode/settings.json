@@ -3,7 +3,11 @@
     "**/*.g.dart": true
   },
   "cSpell.words": [
+    "autorun",
+    "ctrls",
     "glog",
+    "mobx",
+    "mucklet",
     "mucklets",
     "Ravenry"
   ]

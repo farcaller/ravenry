@@ -39,6 +39,6 @@ class ClientEvent extends BaseEvent {
 
   @override
   Widget toWidget({String? charId}) {
-    return Text(toJson().toString(), style: const TextStyle(color: Colors.red));
+    return Text(msg.toString(), style: const TextStyle(color: Colors.red));
   }
 }

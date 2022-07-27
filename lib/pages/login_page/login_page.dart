@@ -21,9 +21,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobx/mobx.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import '../../providers/client_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:ravenry/stores/store.dart';
 
 const logger = GlogContext('login_page');
 
@@ -53,10 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _resolvingMucklet = false;
   String? _resolvingMuckletError;
-  bool _loggingIn = false;
   String _version = '';
-
-  bool _resolvingSavedAuth = true;
 
   @override
   void dispose() {
@@ -131,57 +130,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _onLogin() async {
-    if (_loggingIn) {
-      return;
-    }
-    if (_formKey.currentState?.validate() ?? false) {
-      await _storage.write(key: kAuthUsername, value: _usernameController.text);
-      await _storage.write(key: kAuthPassword, value: _passwordController.text);
-      await _storage.write(key: kAuthMuckletApi, value: _muckletApi);
-    }
-    try {
-      if (!mounted) return;
-      setState(() => _loggingIn = true);
-
-      final ok = await ClientProvider.of(context).tryLogin(
-          login: _usernameController.text,
+    if (_formKey.currentState?.validate() == true) {
+      await context.read<RootStore>().login(
+          username: _usernameController.text,
           password: _passwordController.text,
           api: _muckletApi);
-      if (!ok) return;
-
-      _usernameController.text = '';
-      _passwordController.text = '';
-    } finally {
-      setState(() => _loggingIn = false);
-    }
-
-    if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed('/terminal');
-  }
-
-  @override
-  didChangeDependencies() async {
-    super.didChangeDependencies();
-
-    logger.debug('_resolvingSavedAuth = $_resolvingSavedAuth');
-
-    if (_resolvingSavedAuth) {
-      final clientProvider = ClientProvider.of(context);
-      final hasStored = await clientProvider.hasStoredCredentials();
-
-      logger.debug('hasStored = $hasStored');
-
-      if (hasStored) {
-        final ok = await clientProvider.tryLogin();
-        if (ok && mounted) {
-          Navigator.of(context).pushReplacementNamed('/terminal');
-        }
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _resolvingSavedAuth = false;
-      });
     }
   }
 
@@ -194,13 +147,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_resolvingSavedAuth || _loggingIn) {
-      return SpinKitRipple(
-        color: Theme.of(context).primaryColor,
-        size: 50.0,
-      );
-    }
-
     return Scaffold(
         appBar: AppBar(
           title:
@@ -208,108 +154,118 @@ class _LoginPageState extends State<LoginPage> {
           leading: Container(),
         ),
         body: SingleChildScrollView(
-          child: Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: TextFormField(
-                      enabled: !_loggingIn,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: 'Server',
-                          errorText: _resolvingMuckletError,
-                          suffix: _resolvingMucklet
-                              ? const SizedBox(
-                                  height: 14,
-                                  width: 14,
-                                  child: CircularProgressIndicator())
-                              : null),
-                      controller: _domainController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Required field';
-                        }
-                        return null;
-                      },
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.none,
-                      keyboardType: TextInputType.url,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: TextFormField(
-                      enabled: !_loggingIn,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), labelText: 'Username'),
-                      controller: _usernameController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Required field';
-                        }
-                        return null;
-                      },
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.none,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: TextFormField(
-                      enabled: !_loggingIn,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: 'Password',
-                          errorText: ClientProvider.of(context).authError),
-                      controller: _passwordController,
-                      enableSuggestions: false,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: OutlinedButton(
-                        onPressed: _muckletApi != null ? _onLogin : null,
-                        child: const Text(
-                          'Login',
+          child: Observer(
+            builder: (_) {
+              final store = context.watch<RootStore>();
+              return Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: TextFormField(
+                          enabled: !store.loggingIn,
+                          decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: 'Server',
+                              errorText: _resolvingMuckletError,
+                              suffix: _resolvingMucklet
+                                  ? const SizedBox(
+                                      height: 14,
+                                      width: 14,
+                                      child: CircularProgressIndicator())
+                                  : null),
+                          controller: _domainController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Required field';
+                            }
+                            return null;
+                          },
+                          textInputAction: TextInputAction.next,
+                          textCapitalization: TextCapitalization.none,
+                          keyboardType: TextInputType.url,
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: OutlinedButton(
-                        onPressed: _muckletApi != null ? _onMuckletLogin : null,
-                        child: const Text(
-                          'Login with Mucklet',
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: TextFormField(
+                          enabled: !store.loggingIn,
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Username'),
+                          controller: _usernameController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Required field';
+                            }
+                            return null;
+                          },
+                          textInputAction: TextInputAction.next,
+                          textCapitalization: TextCapitalization.none,
+                          keyboardType: TextInputType.emailAddress,
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Text('build version: $_version'),
-                  ),
-                  if (_loggingIn)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: SpinKitRipple(
-                        color: Theme.of(context).primaryColor,
-                        size: 50.0,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Observer(
+                          builder: (_) => TextFormField(
+                            enabled: !store.loggingIn,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                                border: const OutlineInputBorder(),
+                                labelText: 'Password',
+                                errorText:
+                                    context.watch<RootStore>().authError),
+                            controller: _passwordController,
+                            enableSuggestions: false,
+                          ),
+                        ),
                       ),
-                    ),
-                ]),
-              )),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: OutlinedButton(
+                            onPressed: _muckletApi != null ? _onLogin : null,
+                            child: const Text(
+                              'Login',
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: OutlinedButton(
+                            onPressed:
+                                _muckletApi != null ? _onMuckletLogin : null,
+                            child: const Text(
+                              'Login with Mucklet',
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Text('build version: $_version'),
+                      ),
+                      if (store.loggingIn)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15),
+                          child: SpinKitRipple(
+                            color: Theme.of(context).primaryColor,
+                            size: 50.0,
+                          ),
+                        ),
+                    ]),
+                  ));
+            },
+          ),
         ));
   }
 }

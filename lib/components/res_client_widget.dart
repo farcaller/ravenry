@@ -16,10 +16,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:glog/glog.dart';
+import 'package:provider/provider.dart';
 import 'package:res_client/client.dart';
 import 'package:res_client/event.dart';
 
-import '../providers/client_provider.dart';
+import '../stores/store.dart';
 
 const logger = GlogContext('res_widget');
 
@@ -28,7 +29,7 @@ abstract class ResClientWidget extends StatefulWidget {
 }
 
 abstract class ResClientState<T extends StatefulWidget> extends State<T> {
-  ResClient get client => ClientProvider.of(context).client;
+  ResClient get client => context.read<RootStore>().client;
 }
 
 abstract class ResClientEventTrackingState<T extends StatefulWidget>
@@ -46,8 +47,7 @@ abstract class ResClientEventTrackingState<T extends StatefulWidget>
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
-    _clientEvents ??=
-        ClientProvider.of(context).client.events.listen(onResEvent);
+    _clientEvents ??= client.events.listen(onResEvent);
   }
 
   onResEvent(ResEvent event);

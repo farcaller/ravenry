@@ -15,9 +15,11 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:ravenry/providers/client_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:res_client/event.dart';
 import 'package:res_client/model.dart';
+
+import '../stores/store.dart';
 
 typedef ResCollectionWidgetBuilder = Widget Function(
     BuildContext context, ResCollection collection);
@@ -53,7 +55,8 @@ class _ResCollectionWidgetState extends State<ResCollectionWidget> {
       _clientEvents!.cancel();
     }
 
-    _clientEvents = ClientProvider.of(context)
+    _clientEvents = context
+        .watch<RootStore>()
         .client
         .events
         .where((event) => event is CollectionEvent)

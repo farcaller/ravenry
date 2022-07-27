@@ -13,12 +13,13 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:ravenry/components/res_collection_widget.dart';
-import 'package:ravenry/providers/player_provider.dart';
 import 'package:ravenry/theme.dart';
 import 'package:res_client/model.dart';
 
-import '../../providers/client_provider.dart';
+import '../../stores/store.dart';
 import 'character_view.dart';
 
 class CharactersPage extends StatelessWidget {
@@ -26,11 +27,18 @@ class CharactersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = PlayerProvider.of(context).player;
-    if (player == null) {
-      return Container();
-    }
+    final store = context.read<RootStore>();
 
+    return Observer(builder: (_) {
+      final player = store.player;
+      if (player == null) {
+        return Container();
+      }
+      return _buildContents(store, player);
+    });
+  }
+
+  Widget _buildContents(RootStore store, ResModel player) {
     final chars = player['chars'];
     final ctrls = player['controlled'] as ResCollection;
 
@@ -51,12 +59,7 @@ class CharactersPage extends StatelessWidget {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 8, 24, 8, 4),
                             child: InkWell(
-                              onTap: () async {
-                                Navigator.of(context).pop();
-                                Navigator.of(context)
-                                    .pushReplacementNamed('/login');
-                                await ClientProvider.of(context).logout();
-                              },
+                              onTap: () => store.logout(),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 8),

@@ -17,12 +17,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:glog/glog.dart';
+import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:ravenry/pages/session_view/session_view.dart';
-import 'package:ravenry/providers/player_provider.dart';
 import 'package:res_client/event.dart';
 import 'package:res_client/model.dart';
 
 import '../../components/res_client_widget.dart';
+import '../../stores/store.dart';
 import '../../theme.dart';
 
 const logger = GlogContext('terminal_page');
@@ -37,30 +39,46 @@ class TerminalPage extends StatefulWidget {
 }
 
 class _TerminalPageState extends ResClientEventTrackingState<TerminalPage> {
+  late final ReactionDisposer _autorun;
   ResCollection? _ctrls;
   ResModel? _activeCtrl;
   final Map<String, SessionView> _sessions = {};
 
-  ResModel? get _player => PlayerProvider.of(context).player;
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
 
-    _ctrls = _player?['controlled'];
-    _activeCtrl = _ctrls?.items.firstWhere((_) => true, orElse: () => null);
-    for (final ctrl in _ctrls?.items ?? []) {
-      _sessions[ctrl['id']] = SessionView(key: Key(ctrl['id']), ctrl: ctrl);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final store = context.read<RootStore>();
 
-    _checkChars();
+      _autorun = autorun((_) {
+        final player = store.player;
+        _ctrls = player?['controlled'];
+        _activeCtrl = _ctrls?.items.firstWhere((_) => true, orElse: () => null);
+        for (final ctrl in _ctrls?.items ?? []) {
+          if (!_sessions.containsKey(ctrl['id'])) {
+            _sessions[ctrl['id']] =
+                SessionView(key: Key(ctrl['id']), ctrl: ctrl);
+          }
+        }
+
+        if (player != null) _checkChars(player);
+
+        setState(() {});
+      });
+    });
   }
 
-  _checkChars() {
-    if (_player == null) return;
-    if ((_player!['controlled'] as ResCollection).items.isEmpty) {
+  @override
+  void dispose() {
+    _autorun();
+    super.dispose();
+  }
+
+  _checkChars(ResModel player) {
+    if ((player['controlled'] as ResCollection).items.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback(
-          (_) => Navigator.pushNamed(context, '/selectChar'));
+          (_) => Navigator.pushNamed(context, 'selectChar'));
     }
   }
 
@@ -102,14 +120,14 @@ class _TerminalPageState extends ResClientEventTrackingState<TerminalPage> {
     _activeCtrl ??= ctrls.items.firstWhere((_) => true, orElse: () => null);
 
     if (_activeCtrl == null) {
-      Navigator.pushNamed(context, '/selectChar');
+      Navigator.pushNamed(context, 'selectChar');
       return;
     }
   }
 
   _switchCtrl(dynamic value) {
     if (value == _kSelectChar) {
-      Navigator.pushNamed(context, '/selectChar');
+      Navigator.pushNamed(context, 'selectChar');
     } else {
       assert(value is ResModel);
       setState(() {

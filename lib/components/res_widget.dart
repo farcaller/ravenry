@@ -15,11 +15,12 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:res_client/client.dart';
 import 'package:res_client/event.dart';
 import 'package:res_client/model.dart';
 
-import '../providers/client_provider.dart';
+import '../stores/store.dart';
 
 typedef ResWidgetBuilder = Widget Function(
     BuildContext context, Map<String, dynamic> modelData, String rid);
@@ -38,7 +39,7 @@ class ResWidget extends StatefulWidget {
 class _ResWidgetState extends State<ResWidget> {
   StreamSubscription? _clientEvents;
 
-  ResClient get _client => ClientProvider.of(context).client;
+  ResClient get _client => context.watch<RootStore>().client;
 
   @override
   void dispose() {

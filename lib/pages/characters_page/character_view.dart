@@ -13,10 +13,12 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:ravenry/components/res_widget.dart';
-import 'package:ravenry/providers/client_provider.dart';
 import 'package:res_client/client.dart';
 import 'package:res_client/model.dart';
+
+import '../../stores/store.dart';
 
 class CharacterView extends StatefulWidget {
   final ResModel player;
@@ -30,23 +32,23 @@ class CharacterView extends StatefulWidget {
 }
 
 class _CharacterViewState extends State<CharacterView> {
-  ResClient get _client => ClientProvider.of(context).client;
-
   _selectChar() async {
+    final client = context.read<RootStore>().client;
+
     final charId = widget.char['id'] as String;
 
     var ctrl = (widget.player['controlled'] as ResCollection)
         .items
         .firstWhere((c) => c['id'] == charId, orElse: () => null) as ResModel?;
 
-    ctrl ??= await _client
+    ctrl ??= await client
         .call(widget.player.rid, 'controlChar', params: {'charId': charId});
 
     if (ctrl == null) {
       throw 'failed to get ctrl';
     }
     if (ctrl['state'] != 'awake') {
-      await _client.call(ctrl.rid, 'wakeup');
+      await client.call(ctrl.rid, 'wakeup');
     }
 
     if (!mounted) return;

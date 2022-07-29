@@ -127,6 +127,7 @@ abstract class _RootStore with Store {
 
       try {
         // TODO: this throws on web but not on mobile. ffs?..
+        _client.forceClose();
         await _client.reconnect(Uri.parse(_currentApi!));
       } catch (e) {
         logger.error('reconnect error: $e');

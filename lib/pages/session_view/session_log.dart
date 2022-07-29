@@ -41,7 +41,7 @@ class _SessionLogState extends ResClientEventTrackingState<SessionLog> {
   @override
   void initState() {
     super.initState();
-    _getReplaybuffer();
+    _getReplayLog();
   }
 
   @override
@@ -51,7 +51,7 @@ class _SessionLogState extends ResClientEventTrackingState<SessionLog> {
     super.dispose();
   }
 
-  _getReplaybuffer() async {
+  _getReplayLog() async {
     final ctrl = widget.ctrl;
     final lastTime = _events.isEmpty
         ? 0
@@ -84,7 +84,7 @@ class _SessionLogState extends ResClientEventTrackingState<SessionLog> {
         setState(() {
           _events.add(ClientEvent('Connected to server'));
         });
-        _getReplaybuffer();
+        _getReplayLog();
         break;
       case DisconnectedEvent:
         setState(() {

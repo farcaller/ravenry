@@ -102,6 +102,7 @@ class _MyAppState extends State<MyApp> {
   MaterialApp _buildApp(BuildContext context, bool hasCredentials) {
     return MaterialApp(
       title: 'Ravenry',
+      theme: theme,
       navigatorKey: _navigatorKey,
       initialRoute: hasCredentials ? '/' : 'login',
       routes: {

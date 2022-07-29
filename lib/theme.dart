@@ -28,19 +28,6 @@ const kContextText = TextStyle(color: Color(0xff93969f));
 const kEventText =
     TextStyle(color: Color(0xff93969f), fontStyle: FontStyle.italic);
 
-final theme = ThemeData(
-  colorScheme: const ColorScheme(
-    brightness: Brightness.dark,
-    primary: Color(0xff1d2233),
-    onPrimary: Color(0xffbec0c5),
-    background: Color(0xff161926),
-    onBackground: Colors.grey,
-    surface: Color(0xff1d2233),
-    onSurface: Color(0xffbec0c5),
-    error: Colors.red,
-    onError: Colors.red,
-    secondary: Color(0xff1d2233),
-    onSecondary: Colors.red,
-  ),
-  backgroundColor: const Color(0xff161926),
-);
+final theme = ThemeData.from(
+    colorScheme:
+        ColorScheme.fromSeed(seedColor: kBlue1, brightness: Brightness.dark));

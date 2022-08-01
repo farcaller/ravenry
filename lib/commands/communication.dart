@@ -45,7 +45,7 @@ final communicationCommands = [
   Command(
       r(r'(?:whisper|w|wh)\s+(?<target>[^=]+)\s*=\s*(?<ooc>>?)\s*(?<pose>:?)\s*(?<msg>.+)'),
       (m, r) {
-    final target = m.namedGroup('target')!.toLowerCase();
+    final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.ctrl['inRoom']['chars'].items as List;
 
     final targetId = _getTarget(chars, target);
@@ -62,7 +62,7 @@ final communicationCommands = [
   Command(
       r(r'(?:message|m|msg|p|page)\s+(?<target>[^=]+)\s*=\s*(?<ooc>>?)\s*(?<pose>:?)\s*(?<msg>.+)'),
       (m, r) {
-    final target = m.namedGroup('target')!.toLowerCase();
+    final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.store.awakeChars;
 
     final targetId = _getTarget(chars, target);
@@ -79,7 +79,7 @@ final communicationCommands = [
   Command(
       r(r'(?:address\s+|@|to\s+)\s*(?<target>[^=]+)\s*=\s*(?<ooc>>?)\s*(?<pose>:?)\s*(?<msg>.+)'),
       (m, r) {
-    final target = m.namedGroup('target')!.toLowerCase();
+    final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.ctrl['inRoom']['chars'].items as List;
 
     final targetId = _getTarget(chars, target);
@@ -101,7 +101,7 @@ final communicationCommands = [
   Command(
       r(r'(?:mail)\s+(?<target>[^=]+)\s*=\s*(?<ooc>>?)\s*(?<pose>:?)\s*(?<msg>.+)'),
       (m, r) {
-    final target = m.namedGroup('target')!.toLowerCase();
+    final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.store.awakeChars;
 
     final targetId = _getTarget(chars, target);

@@ -153,6 +153,10 @@ class TargetedCharacterMessageEvent extends BaseEvent {
     return [];
   }
 
+  String textContent() {
+    return '$msg';
+  }
+
   bool get _warning => type == 'warn';
 
   Widget _framedWidget({String? charId}) {

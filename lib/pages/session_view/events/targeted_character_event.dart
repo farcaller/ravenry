@@ -129,6 +129,10 @@ class TargetedCharacterEvent extends BaseEvent {
     ];
   }
 
+  String textContent() {
+    return '';
+  }
+
   @override
   Widget toWidget({String? charId}) {
     return Padding(

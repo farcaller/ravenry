@@ -13,14 +13,18 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:glog/glog.dart';
+import 'package:provider/provider.dart';
 import 'package:ravenry/components/res_client_widget.dart';
 import 'package:ravenry/pages/session_view/events/base_event.dart';
+import 'package:ravenry/pages/session_view/events/targeted_character_event.dart';
 import 'package:res_client/event.dart';
 import 'package:res_client/model.dart';
 
 import '../../theme.dart';
 import 'events/client_event.dart';
+import 'events/targeted_character_message_event.dart';
 
 const logger = GlogContext('session_log');
 
@@ -95,8 +99,11 @@ class _SessionLogState extends ResClientEventTrackingState<SessionLog> {
         final e = event as GenericEvent;
         if (e.rid != widget.ctrl.rid) return;
         if (e.name != 'out') return;
+
+        final evt = BaseEvent.fromJson(e.payload);
+        _maybeSendNotification(evt);
         setState(() {
-          _events.add(BaseEvent.fromJson(e.payload));
+          _events.add(evt);
           logger.debug(
               'now have ${_events.length} events for ${widget.ctrl['name']}');
         });
@@ -104,6 +111,27 @@ class _SessionLogState extends ResClientEventTrackingState<SessionLog> {
     }
     // TODO: this is still janky because the scrolling isn't preserved on adding.
     if (!_shouldShowToBottom) _scrollDown();
+  }
+
+  void _maybeSendNotification(BaseEvent evt) {
+    if (evt is TargetedCharacterMessageEvent &&
+        evt.target.id == widget.ctrl['id']) {
+      logger.debug('will notify for $evt');
+      final plugin = context.read<FlutterLocalNotificationsPlugin>();
+
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails('your channel id', 'your channel name',
+              channelDescription: 'your channel description',
+              importance: Importance.max,
+              priority: Priority.high,
+              ticker: 'ticker');
+      const NotificationDetails platformChannelSpecifics =
+          NotificationDetails(android: androidPlatformChannelSpecifics);
+
+      plugin.show(0, '${evt.char.name} ${evt.char.surname}', evt.textContent(),
+          platformChannelSpecifics,
+          payload: 'payload');
+    }
   }
 
   void _scrollDown() {

@@ -48,7 +48,7 @@ final communicationCommands = [
     final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.ctrl['inRoom']['chars'].items as List;
 
-    final targetId = _getTarget(chars, target);
+    final targetId = getTarget(chars, target);
     if (targetId == null) {
       return false;
     }
@@ -65,7 +65,7 @@ final communicationCommands = [
     final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.store.awakeChars;
 
-    final targetId = _getTarget(chars, target);
+    final targetId = getTarget(chars, target);
     if (targetId == null) {
       return false;
     }
@@ -82,7 +82,7 @@ final communicationCommands = [
     final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.ctrl['inRoom']['chars'].items as List;
 
-    final targetId = _getTarget(chars, target);
+    final targetId = getTarget(chars, target);
     if (targetId == null) {
       return false;
     }
@@ -104,7 +104,7 @@ final communicationCommands = [
     final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.store.awakeChars;
 
-    final targetId = _getTarget(chars, target);
+    final targetId = getTarget(chars, target);
     if (targetId == null) {
       return false;
     }
@@ -120,25 +120,3 @@ final communicationCommands = [
     // });
   }),
 ];
-
-String? _getTarget(List chars, String target) {
-  final byName = chars
-      .where((c) => (c['name'] as String).toLowerCase() == target)
-      .toList();
-  if (byName.length == 1) {
-    return byName[0]['id'];
-  }
-  if (byName.length > 1) {
-    // TODO: report to user
-    logger.warning('matched more than 1 character for `$target`');
-    return null;
-  }
-  final byFull = chars
-      .where((c) => '${c['name']} ${c['surname']}'.toLowerCase() == target)
-      .toList();
-  if (byName.length == 1) {
-    return byFull[0]['id'];
-  }
-  logger.warning("can't find $target");
-  return null;
-}

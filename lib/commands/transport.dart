@@ -31,4 +31,55 @@ final transportCommands = [
       logger.error(e.message);
     }
   }),
+  Command(r(r'(?:follow|hopon)\s+(?<target>.+)'), (m, r) {
+    final target = m.namedGroup('target')!.toLowerCase().trim();
+    final chars = r.ctrl['inRoom']['chars'].items as List;
+
+    final targetId = getTarget(chars, target);
+    if (targetId == null) {
+      return false;
+    }
+    r.client.call(r.ctrl.rid, 'follow', params: {
+      'charId': targetId,
+    });
+  }),
+  Command(r(r'(?:lead|carry)\s+(?<target>.+)'), (m, r) {
+    final target = m.namedGroup('target')!.toLowerCase().trim();
+    final chars = r.ctrl['inRoom']['chars'].items as List;
+
+    final targetId = getTarget(chars, target);
+    if (targetId == null) {
+      return false;
+    }
+    r.client.call(r.ctrl.rid, 'lead', params: {
+      'charId': targetId,
+    });
+  }),
+  Command(r(r'(?:join|mjoin)\s+(?<target>.+)'), (m, r) {
+    final target = m.namedGroup('target')!.toLowerCase().trim();
+    final chars = r.store.awakeChars;
+
+    final targetId = getTarget(chars, target);
+    if (targetId == null) {
+      return false;
+    }
+    r.client.call(r.ctrl.rid, 'follow', params: {
+      'charId': targetId,
+    });
+  }),
+  Command(r(r'(?:summon|msummon)\s+(?<target>.+)'), (m, r) {
+    final target = m.namedGroup('target')!.toLowerCase().trim();
+    final chars = r.store.awakeChars;
+
+    final targetId = getTarget(chars, target);
+    if (targetId == null) {
+      return false;
+    }
+    r.client.call(r.ctrl.rid, 'summon', params: {
+      'charId': targetId,
+    });
+  }),
+  Command(r(r'(?:home|gohome)'), (m, r) {
+    r.client.call(r.ctrl.rid, 'teleportHome');
+  }),
 ];

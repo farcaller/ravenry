@@ -12,6 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:glog/glog.dart';
+
+const logger = GlogContext('runner:helpers');
+
 RegExp r(String p) {
   return RegExp(r'^' + p + r'$', caseSensitive: false);
+}
+
+String? getTarget(List chars, String target) {
+  target = target.toLowerCase();
+  final byName = chars
+      .where((c) => (c['name'] as String).toLowerCase() == target)
+      .toList();
+  if (byName.length == 1) {
+    return byName[0]['id'];
+  }
+  if (byName.length > 1) {
+    // TODO: report to user
+    logger.warning('matched more than 1 character for `$target`');
+    return null;
+  }
+  final byFull = chars
+      .where((c) => '${c['name']} ${c['surname']}'.toLowerCase() == target)
+      .toList();
+  if (byFull.length == 1) {
+    return byFull[0]['id'];
+  }
+  logger.warning("can't find $target");
+  return null;
 }

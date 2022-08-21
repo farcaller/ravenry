@@ -55,6 +55,12 @@ final transportCommands = [
       'charId': targetId,
     });
   }),
+  Command(r(r'(?:stop\s+follow|hopoff)'), (m, r) {
+    r.client.call(r.ctrl.rid, 'stopFollow');
+  }),
+  Command(r(r'(?:stop\s+lead|dropoff)'), (m, r) {
+    r.client.call(r.ctrl.rid, 'stopLead');
+  }),
   Command(r(r'(?:join|mjoin)\s+(?<target>.+)'), (m, r) {
     final target = m.namedGroup('target')!.toLowerCase().trim();
     final chars = r.store.awakeChars;

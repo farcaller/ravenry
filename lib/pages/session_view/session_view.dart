@@ -13,12 +13,15 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:glog/glog.dart';
 import 'package:ravenry/components/res_client_widget.dart';
 import 'package:ravenry/pages/session_view/session_log.dart';
 import 'package:res_client/model.dart';
 
 import '../../theme.dart';
 import 'input_view.dart';
+
+const logger = GlogContext('session_view');
 
 class SessionView extends ResClientWidget {
   final ResModel ctrl;
@@ -39,17 +42,24 @@ class _SessionViewState extends State<SessionView> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       color: kBlue1,
-      child: InputProvider(
-        setCommand: _inputViewKey.currentState?.setCommand ?? (_) {},
-        child: Column(
-          children: [
-            Expanded(child: SessionLog(ctrl: ctrl)),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: InputView(key: _inputViewKey, ctrl: ctrl),
-            ),
-          ],
-        ),
+      child: Column(
+        children: [
+          Expanded(
+              child: InputProvider(
+                  setCommand: (cmd) {
+                    if (_inputViewKey.currentState != null) {
+                      _inputViewKey.currentState!.setCommand(cmd);
+                    } else {
+                      logger.warning(
+                          'no state for _inputViewKey, dropping $cmd: ${_inputViewKey.currentState == null}');
+                    }
+                  },
+                  child: SessionLog(ctrl: ctrl))),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: InputView(key: _inputViewKey, ctrl: ctrl),
+          ),
+        ],
       ),
     );
   }

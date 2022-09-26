@@ -27,6 +27,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:ravenry/stores/store.dart';
 
+import '../../version.dart';
+
 const logger = GlogContext('login_page');
 
 typedef LoginCallback = void Function();
@@ -86,7 +88,8 @@ class _LoginPageState extends State<LoginPage> {
     final muckletApi = await _storage.read(key: kAuthMuckletApi);
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    _version = '${packageInfo.version} (${packageInfo.buildNumber})';
+    _version =
+        '${packageInfo.version} (${packageInfo.buildNumber}) $kGitBranch@$kGitHash';
 
     if (!mounted) return;
     setState(() {

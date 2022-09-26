@@ -58,6 +58,13 @@ jobs:
       
       - run: flutter pub get
 
+      - shell: bash
+        run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          git_branch=${GITHUB_REF#refs/heads/}
+          echo -ne "const kGitHash = '${git_hash}';\n" > ./lib/version.dart
+          echo -ne "const kGitBranch = '${git_branch}';\n" >> ./lib/version.dart
+
       - name: Set up andorid credenitals
         run: |
           echo "::add-mask::${{ secrets.KEYSTORE_PASSWORD }}"

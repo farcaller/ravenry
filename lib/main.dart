@@ -35,7 +35,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (kIsWeb || !Platform.isWindows) {
-    logger.info('enabling firebase');
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
